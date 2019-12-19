@@ -36,13 +36,15 @@ public class Examination {
         exam1.check();
     }
     public void Exam1_2(Scanner input){
-        System.out.println("Nhap vi tri ban dau cua quan tuong:");
-        String oldPos = input.nextLine();
-        System.out.println("Nhap vi tri ban dau cua quan tuong:");
-        String newPos = input.nextLine();
+        System.out.println("Nhap dau vao:");
+        String inputString = input.nextLine();
+//        System.out.println("Nhap vi tri ban dau cua quan tuong:");
+//        String newPos = input.nextLine();
+        String oldPos = inputString.split("=>")[0];
+        String newPos = inputString.split("=>")[1];
         System.out.println("Nhap vi tri can cua quan tuong:");
         String barries = input.nextLine();
         ChessBroad cb = new ChessBroad();
-        cb.printResult(oldPos, newPos, cb.findMinPath(barries, cb.createGraph(oldPos, barries)));
+        cb.printResult(oldPos, newPos, cb.findMinPath(oldPos, cb.createGraph(oldPos, barries)));
     }
 }

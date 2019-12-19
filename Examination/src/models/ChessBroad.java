@@ -17,7 +17,7 @@ public class ChessBroad {
     public Vector<Position> createGraph(String pos,String barriers){
         String keys [] = {"a","b","c","d","e","f","g","h"};
         Vector<Position> graph = new Vector<Position>();
-        String [] bars = barriers.split(",");
+        String [] bars = barriers.split(";");
         Vector<Position> darkLand = new Vector<Position>();
         Vector<Position> lightLand = new Vector<Position>();
         Position position = new Position();
@@ -49,24 +49,28 @@ public class ChessBroad {
     public Vector<Position> findMinPath(String startName,Vector<Position>graph){
         //Tìm điểm bắt đầu
         Position start = graph.get(0);
-        start.setDistance(1);
+        start.setDistance(0);
+        start.setParent(start);
         //Tìm đường đi ngắn nhất
         for(int i=0;i<graph.size();i++){
-            if(graph.get(i).isVisited()==true){
-                continue;
-            }
+//            if(graph.get(i).isVisited()==true){
+//                continue;
+//            }
             Vector<Position> neighbor = new Vector<Position>();
             Position cur = this.getObjectMinDistance(graph);
+            
             if(cur == null){
                 continue;
             }
+            //System.err.println(i+ " Name: "+cur.getName()+" khoang cach: "+cur.getDistance());
             if(cur.getParent() == null & i!=0){
                 return graph;
             }
             cur.setVisited(true);
             neighbor = cur.getNeighbor();
             for(int j = 0;j<neighbor.size();j++){
-                if(isCheck(neighbor.get(j).getName(),graph)==true){
+                Position itemNei = this.searchPosition(neighbor.get(j).getName(), graph);
+                if(itemNei.isVisited() == true){
                     continue;
                 }
                 int distance=0;
@@ -74,26 +78,43 @@ public class ChessBroad {
                     distance = 1;
                     cur.setParent(cur);
                 }else{
-                    if(this.checkLine(cur.getParent(), cur, neighbor.get(j))==true){
+                    if(this.checkLine(cur.getParent(), cur, itemNei)==true){
                         distance = cur.getDistance();
                     }else{
                         distance = cur.getDistance()+1;
                     }
                 }
                 
-                if(distance<neighbor.get(j).getDistance()){
-                    //neighbor.get(j).setDistance(distance);
+                if(distance<itemNei.getDistance()){
                     if(distance == cur.getDistance()){
-                        this.setDistanceParent(neighbor.get(j).getName(), distance, cur.getParent(), graph);
-                        //neighbor.get(j).setParent(cur.getParent());
+                        itemNei.setDistance(distance);
+                        itemNei.setParent(cur.getParent());
                     }else{
-                        this.setDistanceParent(neighbor.get(j).getName(), distance, cur, graph);
-                        //neighbor.get(j).setParent(cur);
+                        itemNei.setDistance(distance);
+                        itemNei.setParent(cur);
                     }
                 }
             }
         }
         return graph;
+    }
+    
+    public Position searchPosition(String name,Vector<Position> graph){
+        for(int i=0;i<graph.size();i++){
+            if(graph.get(i).getName().equals(name)){
+                return graph.get(i);
+            }
+        }
+        return null;
+    }
+    
+    public boolean fullCheck(Vector<Position> graph){
+        for(int i=0;i<graph.size();i++){
+            if(graph.get(i).isVisited()==false){
+                return false;
+            }
+        }
+        return true;
     }
     
     public boolean isCheck(String name,Vector<Position> graph){
@@ -139,15 +160,15 @@ public class ChessBroad {
                 }
             }
         }
-        if(result == null){
-            for(int i = 0;i<graph.size();i++){
-                if(graph.get(i).isVisited()==false){
-                    if(graph.get(i).getDistance()==min){
-                        result = graph.get(i);
-                    }
-                }
-            }
-        }
+//        if(result == null){
+//            for(int i = 0;i<graph.size();i++){
+//                if(graph.get(i).isVisited()==false){
+//                    if(graph.get(i).getDistance()==min){
+//                        result = graph.get(i);
+//                    }
+//                }
+//            }
+//        }
         return result;
     }
     
@@ -182,6 +203,6 @@ public class ChessBroad {
         for(int i = paths.size()-2;i>=0;i--){
             System.out.print(" => "+paths.get(i));
         }
-        System.err.println("");
+        System.out.println("");
     }
 }
